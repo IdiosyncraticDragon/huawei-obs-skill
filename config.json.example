@@ -1,0 +1,25 @@
+{
+    "obs": {
+        "server": "obs.cn-south-222.ai.pcl.cn",
+        "bucket_name": "your-bucket-name",
+        "obs_prefix": "videos"
+    },
+    "local": {
+        "parent_dir": "~/Downloads/深汕原始数据"
+    },
+    "schedule": {
+        "enable": true,
+        "interval": 3600
+    },
+    "upload": {
+        "max_file_count": 0,
+        "timeout": 300
+    },
+    "log": {
+        "level": "INFO",
+        "dir": "logs"
+    },
+    "video": {
+        "extensions": [".mp4", ".avi", ".mov", ".wmv", ".flv", ".mkv"]
+    }
+}
