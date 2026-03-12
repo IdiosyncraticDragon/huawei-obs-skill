@@ -1,14 +1,2 @@
-# 华为云OBS SDK
-huaweicloud-sdk-python-obs
-
-# 环境变量管理
-python-dotenv
-
-# 定时任务
-APScheduler
-
-# 日志管理
-loguru
-
-# 进度条
-tqdm
+huaweicloud-sdk-python-obs >= 3.22.12
+python-dotenv >= 1.0.0

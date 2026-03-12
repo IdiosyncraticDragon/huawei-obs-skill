@@ -1,134 +1,77 @@
 ---
-name: huawei-obs-uploader
-description: 华为云 OBS 视频文件自动上传工具。支持定时扫描本地摄像头视频文件，自动上传到华为云 OBS 存储，并删除本地文件。
+name: huawei-obs-sdk
+description: 华为云 OBS 对象存储 SDK 使用指南。包含 SDK 安装、初始化客户端、文件上传/下载、管理存储桶、管理对象等核心操作的最佳实践和代码示例。使用当需要操作华为云 OBS 对象存储时。
 ---
 
-# 华为云 OBS 视频上传 Skill
+# 华为云 OBS SDK 使用指南
 
-这是一个华为云 OBS 视频自动上传工具，适用于摄像头视频文件的自动备份场景。
-
-## 功能特性
-
-- 📁 **自动扫描**：定时扫描本地摄像头文件夹中的视频文件
-- ☁️ **自动上传**：将视频文件上传到华为云 OBS 对象存储
-- 🗑️ **自动清理**：上传成功后自动删除本地文件，节省存储空间
-- 📊 **详细日志**：记录所有上传操作和结果，支持问题排查
-- ⏰ **定时任务**：支持配置定时上传间隔，无需人工干预
-- 🔒 **安全配置**：敏感信息通过环境变量配置，避免泄露
-
-## 适用场景
-
-- 安防摄像头视频自动备份
-- 监控视频云端存储
-- 本地视频文件自动归档
-- 多摄像头视频集中管理
+本技能提供华为云 OBS（对象存储服务）Python SDK 的核心使用方法和最佳实践。
 
 ## 快速开始
 
-### 1. 安装依赖
-
+### 1. 安装 SDK
 ```bash
-pip install -r requirements.txt
+pip install huaweicloud-sdk-python-obs
 ```
 
-### 2. 配置文件
+### 2. 初始化客户端
+```python
+from obs import ObsClient
 
-复制配置示例：
-```bash
-cp config.json.example config.json
-cp .env.example .env
+# 初始化 OBS 客户端
+obs_client = ObsClient(
+    access_key_id='YOUR_ACCESS_KEY',
+    secret_access_key='YOUR_SECRET_KEY',
+    server='obs.cn-east-3.myhuaweicloud.com'  # 根据实际区域填写
+)
 ```
 
-编辑 `.env` 文件，配置华为云 OBS 密钥：
-```env
-OBS_AK=你的华为云AK
-OBS_SK=你的华为云SK
+### 3. 关闭客户端
+```python
+obs_client.close()
 ```
 
-编辑 `config.json` 文件，配置 OBS 和本地路径：
-```json
-{
-  "obs": {
-    "server": "obs.cn-east-3.myhuaweicloud.com",
-    "bucket_name": "你的存储桶名称",
-    "obs_prefix": "videos"
-  },
-  "local": {
-    "parent_dir": "~/Videos/cameras"
-  },
-  "schedule": {
-    "enable": true,
-    "interval": 3600
-  }
-}
+## 核心操作
+
+### 存储桶管理
+参考 [references/bucket_operations.md](references/bucket_operations.md)
+- 创建/删除存储桶
+- 存储桶权限配置
+- 存储桶生命周期管理
+- 存储桶跨域配置
+
+### 对象操作
+参考 [references/object_operations.md](references/object_operations.md)
+- 上传文件/文件夹
+- 下载文件/文件夹
+- 删除/复制/移动对象
+- 列举对象
+- 断点续传
+- 预签名 URL 生成
+
+### 高级功能
+参考 [references/advanced_features.md](references/advanced_features.md)
+- 版本控制
+- 服务器端加密
+- 跨域资源共享 (CORS)
+- 事件通知
+- 生命周期规则
+
+## 安全最佳实践
+1. 不要硬编码 AK/SK，使用环境变量或配置文件管理
+2. 为 OBS 账户分配最小必要权限
+3. 定期轮换访问密钥
+4. 使用 HTTPS 协议访问 OBS 服务
+5. 敏感数据上传前建议客户端加密
+
+## 错误处理
+```python
+try:
+    resp = obs_client.putFile('bucket_name', 'object_key', 'local_file_path')
+    if resp.status < 300:
+        print('上传成功')
+    else:
+        print(f'上传失败: {resp.errorMessage}')
+except Exception as e:
+    print(f'操作异常: {e}')
 ```
-
-### 3. 运行程序
-
-```bash
-# 单次执行上传
-python main.py
-
-# 查看配置信息
-python config.py
-```
-
-## 配置说明
-
-### OBS 配置
-
-| 参数 | 说明 | 默认值 |
-|------|------|--------|
-| ak | 华为云访问密钥 AK | 从环境变量读取 |
-| sk | 华为云访问密钥 SK | 从环境变量读取 |
-| server | OBS 服务端点 | obs.cn-east-3.myhuaweicloud.com |
-| bucket_name | OBS 存储桶名称 | 必填 |
-| obs_prefix | OBS 中文件存储的前缀目录 | videos |
-
-### 本地配置
-
-| 参数 | 说明 | 默认值 |
-|------|------|--------|
-| local_parent_dir | 本地视频文件根目录 | ~/Downloads/深汕原始数据 |
-
-### 定时任务配置
-
-| 参数 | 说明 | 默认值 |
-|------|------|--------|
-| enable_schedule | 是否启用定时任务 | true |
-| upload_interval | 上传间隔（秒） | 3600（1小时） |
-
-### 支持的视频格式
-
-默认支持：`.mp4`, `.avi`, `.mov`, `.wmv`, `.flv`, `.mkv`
-
-## 目录结构
-
-```
-huawei-obs-skill/
-├── SKILL.md              # 技能说明文档
-├── main.py               # 程序入口
-├── uploader.py           # OBS 上传核心模块
-├── config.py             # 配置管理模块
-├── file_scanner.py       # 文件扫描模块
-├── logger.py             # 日志模块
-├── requirements.txt      # 依赖列表
-├── config.json.example   # 配置文件示例
-└── .env.example          # 环境变量示例
-```
-
-## 依赖项
-
-```
-huaweicloud-sdk-python-obs >= 3.22.12
-python-dotenv >= 1.0.0
-tqdm >= 4.66.0
-```
-
-## 作者
-
-Guiying Li
-
-## 许可证
-
-MIT
